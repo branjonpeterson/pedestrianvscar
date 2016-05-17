@@ -439,7 +439,11 @@ svg {background-color: #E0E0E0}
 
     var scale = d3.scale.quantile()
        .domain(new_array)
-       .range([0, .1, .2, .4, .8, 1.6]);
+       .range([0, -0.2, -0.4, -0.6, -0.8, -1]);
+
+    console.log(new_array);
+    console.log(arrayLength);
+
 
 	function resize(d){
         var width = window.innerWidth;
@@ -506,34 +510,6 @@ svg {background-color: #E0E0E0}
 	  	t.transition()
 	    	.call(zoomTo(prince_abdul, 10).event)
 	    	.duration(60 * 2000 / 89 * 2);
-	    // d3.selectAll(".incident").each(function(each){
-     //        d3.select(this).style("stroke", function(d){
-	    //         if (d.properties.gid == 1331) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (d.properties.gid == 10095) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (d.properties.gid == 5238) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (d.properties.gid == 13960) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (d.properties.gid == 1403) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (d.properties.gid == 7816) {
-	    //             return "yellow";
-	    //         }
-	    //         else if (ui_map3.get('toggled') == 'false') {
-	    //             return "#fff";
-	    //         }
-	    //         else {
-	    //             return "black";
-	    //         };
-     //    	});
-     //    });
 	};
 
 	function location2(){
@@ -720,9 +696,7 @@ svg {background-color: #E0E0E0}
       .style( "stroke", "#fff")
       .attr( "d", geoPath )
       .style( "stroke-linecap", "round")
-      .style( "stroke-width", function(d){
-          return Math.log(d.properties.am_TTI * 1.2);
-      });
+      .style( "stroke-width", ".25");
 
 // plot tweet points am
   g.selectAll( "path10" )
@@ -890,31 +864,87 @@ svg {background-color: #E0E0E0}
       } 
   });
 
+
+	function shadeColor2(color, percent) {   
+	    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+	    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+	}
+;
+
+
   // fade in/out for street grid
   ui_map3 = d3.map()
   ui_map3.set('toggled', 'false');
   d3.select("#cmn-toggle-3").on("click", function() {
-    if (ui_map3.get('toggled') == 'false') {
-      var selected3 = d3.selectAll(".incident");
-      selected3.transition()
-          .duration(0)
-          .style("stroke", function(d){
-            return "#black";
-          })
-      ui_map3.set('toggled', 'true')
-      } 
-    else {
+  	console.log("clicked");
+  	console.log(inputValue);
+  	console.log(ui_map3.get('toggled'));
+    if (ui_map3.get('toggled') == 'true') {
       var selected3 = d3.selectAll(".incident");
       selected3.transition()
           .duration(0)
           .style("stroke", function(d){
             return "#fff";
           })
+          .style("stroke-width", ".25")
       ui_map3.set('toggled', 'false')
+      console.log("1");
       } 
+    else if (inputValue == "7am - 10am") {
+      var selected3 = d3.selectAll(".incident");
+      selected3.transition()
+          .duration(0)
+          .style("stroke", function(d){
+            return "#black";
+          })
+          .style("stroke-width", function(d){
+            return Math.log(d.properties.am_TTI * 1.2);
+          })
+      ui_map3.set('toggled', 'true')
+      console.log("2");
+    } 
+    else if (inputValue == "10am - 4pm") {
+      var selected3 = d3.selectAll(".incident");
+      selected3.transition()
+          .duration(0)
+          .style("stroke", function(d){
+            return "#black";
+          })
+          .style("stroke-width", function(d){
+            return Math.log(d.properties.md_TTI * 1.2);
+          })
+      ui_map3.set('toggled', 'true')
+      console.log("2");
+    } 
+    else if (inputValue == "4pm - 7pm") {
+      var selected3 = d3.selectAll(".incident");
+      selected3.transition()
+          .duration(0)
+          .style("stroke", function(d){
+            return "#black";
+          })
+          .style("stroke-width", function(d){
+            return Math.log(d.properties.pm_TTI * 1.2);
+          })
+      ui_map3.set('toggled', 'true')
+      console.log("2");
+    } 
+    else {
+      var selected3 = d3.selectAll(".incident");
+      selected3.transition()
+          .duration(0)
+          .style("stroke", function(d){
+            return "#black";
+          })
+          .style("stroke-width", function(d){
+            return Math.log(d.properties.rd_TTI * 1.2);
+          })
+      ui_map3.set('toggled', 'true')
+      console.log("3");
+  } 
   });
 
-  // fade in/out for street grid
+  // fade in/out for tweet points
   ui_map4 = d3.map()
   ui_map4.set('toggled', 'false');
   d3.select("#cmn-toggle-4").on("click", function() {
@@ -938,7 +968,7 @@ svg {background-color: #E0E0E0}
       } 
   });
 
-    var inputValue = null;
+    var inputValue = "7am - 10am";
     var month = ["7am - 10am","10am - 4pm","4pm - 7pm","7pm - 7am"];
 
     // when the input range changes update the value 
@@ -952,7 +982,10 @@ svg {background-color: #E0E0E0}
         inputValue = month[value];
         d3.selectAll(".incident").each(function(each){
             d3.select(this).style("stroke-width", function(d){
-            if (inputValue == "7am - 10am") {
+            if (ui_map3.get('toggled') == 'false') {
+            	return .25;
+            }
+            else if (inputValue == "7am - 10am") {
                 return Math.log(d.properties.am_TTI * 1.2);
             }
             else if (inputValue == "10am - 4pm") {
@@ -1032,6 +1065,42 @@ svg {background-color: #E0E0E0}
         })
     }
 
+    // // when the input range changes update the value 
+    // d3.select("#cmn-toggle-3").on("click", function() {
+    //     update2(inputValue);
+    //     console.log(inputValue)
+    // });
+
+    
+
+    // // update the fill of each SVG of class "incident" with value
+    // function update2(value) {
+    //     d3.selectAll(".incident").each(function(each){
+    //         d3.select(this).style("stroke-width", function(d){
+    //         if (ui_map3.get('toggled') == 'false') {
+    //         	console.log("ran");
+    //         	return .25;
+    //         }
+    //         else if (value == "7am - 10am") {
+    //         	console.log(d.properties.am_TTI);
+    //             return Math.log(d.properties.am_TTI * 1.2);
+    //         }
+    //         else if (value == "10am - 4pm") {
+    //         	console.log(d.properties.md_TTI);
+    //             return Math.log(d.properties.md_TTI * 1.2);
+    //         }
+    //         else if (value == "4pm - 7pm") {
+    //         	console.log(d.properties.pm_TTI);
+    //             return Math.log(d.properties.pm_TTI * 1.2);
+    //         }
+    //         else {
+    //         	console.log(d.properties.rd_TTI);
+    //             return Math.log(d.properties.rd_TTI *1.2);
+    //         };
+    //     });
+    //     })
+    // }
+
   </script>
 
             </div>
@@ -1061,7 +1130,7 @@ svg {background-color: #E0E0E0}
                 <div class="col-lg-8 col-lg-offset-2 text-center">
                     <h2 class="section-heading">About</h2>
                     <hr class="light">
-                    <p class="text-faded">Where can traffic calming measures and the street pedestrianization have the highest impact in Riyadh?</p>
+                    <p class="text-faded">Riyadh is a city with both enormous amounts of traffic congestion and vast possibilities for pedestrian-focused urban design. Its ongoing public transportation development suggests a city invested in improving its walkability, while its current pedestrian zones are showcasing their successes with high amounts of social activity. Where can traffic calming measures and street pedestrianization have the highest impacts in Riyadh, and how can data visualization help find these opportunities?<br><br>Using Twitter data as a proxy for potential pedestrian activity, mapped against car congestion data for Riyadh’s many highways and city streets, Pedestrian Vs. Car visualizes densities of tweets versus densities of traffic in order to find zones of separation and overlap.</p>
                 </div>
             </div>
         </div>
@@ -1082,6 +1151,7 @@ svg {background-color: #E0E0E0}
                                 <h4>
                                     <strong>Twitter</strong>
                                 </h4>
+                                <h5>Tweets collected in Riyadh between Oct. and Dec. 2015.<br><br>Source: Twitter.</h5>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
@@ -1092,6 +1162,8 @@ svg {background-color: #E0E0E0}
                                 <h4>
                                     <strong>Congestion</strong>
                                 </h4>
+                                <h5>Ratio of congested travel time to free travel time by road.<br><br>Source: City of Riyadh.</h5>
+
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
@@ -1102,6 +1174,8 @@ svg {background-color: #E0E0E0}
                                 <h4>
                                     <strong>Roads</strong>
                                 </h4>
+                                <h5>Riyadh street network with road type and length.<br><br>Source: City of Riyadh.</h5>
+                               
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
@@ -1112,6 +1186,8 @@ svg {background-color: #E0E0E0}
                                 <h4>
                                     <strong>Density</strong>
                                 </h4>
+                                <h5>Tweet density calculated within a 300m radius.<br><br>Source: Twitter.</h5>
+                                
                             </div>
                         </div>
                     </div>
@@ -1123,7 +1199,19 @@ svg {background-color: #E0E0E0}
         </div>
         <!-- /.container -->
     </section>
-
+    
+<aside class="call-to-action bg-primary">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Presentation Documents</h2>
+                    <a href="data/harvey_peterson_midterm2.pptx" class="btn btn-lg btn-light">Midterm</a>
+                    <a href="data/FinalPresentation_Revised.pdf" class="btn btn-lg btn-dark">Final</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+    
     <section id="contact">
         <div class="container">
             <div class="row">
